@@ -16,7 +16,32 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from django.contrib import admin
+from django.urls import path, include
+from cards.urls import router as cards_router
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+]
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('api/', include(cards_router.urls)),
+]
+
+urlpatterns += [
+    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+]
+from django.contrib import admin
+from django.urls import path, include
+from accounts.views import get_my_profile 
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    
+    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    
+    path('api/user/me/', get_my_profile), 
 ]
