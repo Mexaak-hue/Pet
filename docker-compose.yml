@@ -1,23 +1,8 @@
-version: "3.9"
-
 services:
-  db:
-    image: postgres:15
-    container_name: postgres_db
-    restart: always
-    environment:
-      POSTGRES_DB: security_app
-      POSTGRES_USER: security_user
-      POSTGRES_PASSWORD: security_pass
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
-
+  # Бэкенд
   backend:
     build: ./backend
     container_name: django_backend
-    command: python manage.py runserver 0.0.0.0:8000
     volumes:
       - ./backend:/app
     ports:
@@ -26,6 +11,29 @@ services:
       - .env
     depends_on:
       - db
+
+  # База данных
+  db:
+    image: postgres:15
+    container_name: postgres_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+
+  # Фронтенд (Добавлен)
+  frontend:
+    build: ./frontend
+    container_name: react_frontend
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules # Чтобы локальные node_modules не перезаписывали контейнерные
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
 
 volumes:
   postgres_data:
