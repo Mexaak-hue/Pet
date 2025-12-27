@@ -20,19 +20,24 @@ const AdminDashboard: React.FC = () => {
 
   // Функция для загрузки данных из Django
   const fetchData = async (tab: string) => {
-    setLoading(true);
-    setError(null);
-    
-    // Определяем эндпоинт в зависимости от вкладки
-    let endpoint = '';
-    switch (tab) {
-      case 'Пользователи': endpoint = 'users/'; break;
-      case 'Роли': endpoint = 'roles/'; break;
-      case 'Объекты': endpoint = 'objects/'; break;
-      case 'Журнал действий': endpoint = 'logs/'; break;
-      default: endpoint = 'users/';
-    }
-
+  setLoading(true);
+  setError(null);
+  
+  let endpoint = '';
+  switch (tab) {
+    case 'Пользователи': 
+      endpoint = 'user/me/'; // Твой Django путь для получения данных юзера
+      break;
+    case 'Объекты': 
+      endpoint = 'cards/';   // Твой Django путь для карточек (в urls.py включен как api/cards/)
+      break;
+    case 'Роли': 
+    case 'Журнал действий':
+      endpoint = 'cards/';   // Временно укажи cards, чтобы не было 404, пока не создашь эти разделы
+      break;
+    default: 
+      endpoint = 'cards/';
+  }
     try {
       const response = await api.get(endpoint);
       setData(response.data);

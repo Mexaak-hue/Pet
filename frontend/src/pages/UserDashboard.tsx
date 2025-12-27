@@ -1,75 +1,45 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import OacCard from '../components/Header/OacCard';
+import React, { useEffect, useState } from 'react';
+import api from '../api/axios';
+import Header from '../components/Header/Header';
+import Container from '../components/Header/Container';
+import Section from '../components/Main/Section';
 
 const UserDashboard: React.FC = () => {
-  // Только те вкладки, которые нужны обычному пользователю
-  const menuItems = ['Журнал действий', 'Вакансии'];
+  const [objects, setObjects] = useState([]);
+
+  useEffect(() => {
+    api.get('cards/')
+      .then(res => setObjects(res.data))
+      .catch(err => console.error("Ошибка загрузки данных", err));
+  }, []);
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] flex flex-col">
-      {/* Навбар пользователя */}
-      <header className="bg-[#0f172a] text-white px-8 py-3 flex justify-between items-center shadow-md">
-        <div className="text-lg font-bold flex items-center gap-2">
-          <span className="text-blue-400">OAC</span> 
-          <span className="text-slate-400 text-sm font-light">| Личный кабинет</span>
-        </div>
-        <div className="flex gap-6 text-sm text-slate-300">
-          <Link to="/" className="hover:text-white transition-colors">На сайт</Link>
-          <button className="hover:text-white transition-colors">Выйти</button>
-        </div>
-      </header>
-
-      <div className="flex flex-1">
-        {/* Сайдбар */}
-        <aside className="w-64 bg-white border-r border-slate-200 p-4 hidden md:block shrink-0">
-          <nav className="space-y-1">
-            {menuItems.map((item, index) => (
-              <button
-                key={item}
-                className={`w-full text-left px-4 py-2 rounded-md text-sm font-medium transition-all ${
-                  index === 0 
-                    ? 'bg-blue-600 text-white shadow-sm' 
-                    : 'text-slate-600 hover:bg-slate-50'
-                }`}
-              >
-                {item}
-              </button>
+    <div className="min-h-screen bg-slate-50">
+      <Header userRole="Пользователь" />
+      <Container>
+        <div className="py-8">
+          <h1 className="text-2xl font-bold text-slate-900 mb-6">Мои Объекты</h1>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {objects.map((obj: any) => (
+              <div key={obj.id} className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                <h3 className="font-bold text-lg text-slate-800">{obj.name}</h3>
+                <p className="text-slate-500 text-sm mt-2">{obj.address}</p>
+                <div className="mt-4 pt-4 border-t border-slate-100 flex justify-between items-center">
+                  <span className="text-xs font-medium px-2 py-1 bg-green-100 text-green-700 rounded">Активен</span>
+                  <button className="text-blue-600 text-sm font-semibold">Подробнее →</button>
+                </div>
+              </div>
             ))}
-          </nav>
-        </aside>
-
-        {/* Контент пользователя */}
-        <main className="flex-1 p-8 space-y-8 overflow-y-auto">
-          <h1 className="text-2xl font-bold text-slate-800 mb-6">Добро пожаловать!</h1>
-
-          {/* Секция Журнал */}
-          <OacCard 
-            title="Ваш журнал действий" 
-            buttonText="Скачать отчет"
-            headers={['Дата', 'Событие', 'Статус']}
-            data={[
-              { date: '2025-12-25 10:00', event: 'Вход в систему', status: 'Успешно' },
-              { date: '2025-12-24 18:30', event: 'Запрос доступа к Зоне 1', status: 'Отклонено' },
-            ]}
-          />
-
-          {/* Секция Вакансии */}
-          <OacCard 
-            title="Доступные вакансии" 
-            buttonText="Откликнуться"
-            headers={['Должность', 'Объект', 'Зарплата']}
-            data={[
-              { role: 'Администратор зала', object: 'ТЦ "Метро"', salary: '65 000 руб.' },
-              { role: 'Специалист контроля', object: 'Склад №3', salary: '55 000 руб.' },
-            ]}
-          />
-
-          <footer className="text-center py-10 text-slate-400 text-[10px] uppercase tracking-widest">
-            Личный кабинет сотрудника OAC
-          </footer>
-        </main>
-      </div>
+          </div>
+          
+          {objects.length === 0 && (
+            <div className="text-center py-20 bg-white rounded-xl border-2 border-dashed border-slate-200">
+              <p className="text-slate-400">У вас пока нет назначенных объектов</p>
+            </div>
+          )}
+        </div>
+      </Container>
     </div>
   );
 };
